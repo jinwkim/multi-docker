@@ -6,7 +6,7 @@ before_install:
   - docker build -t jinwkim/react-test -f ./client/Dockerfile.dev ./client
 
 script:
-  - docker run jinkwim/react-test npm run test -- --coverage
+  - docker run -e CI=true jinkwim/react-test yarn test -- --coverage
   
 after_success:
   - docker build -t jinwkim/multi-client ./client
