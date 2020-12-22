@@ -1,0 +1,24 @@
+sudo: required
+services:
+  - docker
+
+before_install:
+  - docker build -t jinwkim/react-test -f ./client/Dockerfile.dev ./client
+
+script:
+  - docker run jinkwim/react-test yarn test -- --coverage
+  
+after_success:
+  - docker build -t jinwkim/multi-client ./client
+  - docker build -t jinwkim/multi-nginx ./nginx
+  - docker build -t jinwkim/multi-server ./server
+  - docker build -t jinwkim/multi-worker ./worker
+
+  # Log into Docker CLI, stored securely on Travis Environment Variables
+  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
+
+  # Take Docker images and push to Docker Hub
+  - docker push jinwkim/multi-client
+  - docker push jinwkim/multi-nginx
+  - docker push jinwkim/multi-server
+  - docker push jinwkim/multi-worker
